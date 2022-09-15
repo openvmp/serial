@@ -1,5 +1,9 @@
 # ROS2 serial
 
+## Introduction
+
+This is a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
+
 This package implements a node to configure and to communicate with serial ports on Linux.
 
 ## User's guide
