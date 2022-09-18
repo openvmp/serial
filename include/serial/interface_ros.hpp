@@ -26,7 +26,7 @@ class Node;
 
 class InterfaceRos {
  public:
-  InterfaceRos(Node *node, const std::string &topics_prefix);
+  InterfaceRos(Node *node, const std::string &interface_prefix);
 
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr inspect_input;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr inspect_output;

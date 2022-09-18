@@ -35,7 +35,7 @@ class Node : public rclcpp::Node {
  private:
   // node parameters
   std::shared_ptr<PortSettings> port_settings_;
-  rclcpp::Parameter topics_prefix_;
+  rclcpp::Parameter interface_prefix_;
 
   // topics
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_input_;

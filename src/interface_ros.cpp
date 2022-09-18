@@ -49,19 +49,21 @@ void InterfaceRos::inject_output_handler_(
   inspect_output->publish(message);
 }
 
-InterfaceRos::InterfaceRos(Node *node, const std::string &topics_prefix)
+InterfaceRos::InterfaceRos(Node *node, const std::string &interface_prefix)
     : node_{node} {
   inspect_input = node->create_publisher<std_msgs::msg::String>(
-      topics_prefix + "/inspect/input", 10);
+      interface_prefix + "/inspect/input", 10);
   inspect_output = node->create_publisher<std_msgs::msg::String>(
-      topics_prefix + "/inspect/output", 10);
+      interface_prefix + "/inspect/output", 10);
 
   inject_input = node->create_service<serial::srv::InjectInput>(
-      "inject/input", std::bind(&InterfaceRos::inject_input_handler_, this,
-                                std::placeholders::_1, std::placeholders::_2));
+      interface_prefix + "/inject/input",
+      std::bind(&InterfaceRos::inject_input_handler_, this,
+                std::placeholders::_1, std::placeholders::_2));
   inject_output = node->create_service<serial::srv::InjectOutput>(
-      "inject/output", std::bind(&InterfaceRos::inject_output_handler_, this,
-                                 std::placeholders::_1, std::placeholders::_2));
+      interface_prefix + "inject/output",
+      std::bind(&InterfaceRos::inject_output_handler_, this,
+                std::placeholders::_1, std::placeholders::_2));
 }
 
 }  // namespace serial

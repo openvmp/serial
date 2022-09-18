@@ -30,7 +30,7 @@ or
 $ ros2 run serial serial_standalone \
   --ros-args \
   --remap serial:__node:=serial_com1 \
-  -p topics:=/serial/com1 \
+  -p interface_prefix:=/serial/com1 \
   -p dev_name:=/dev/ttyS0 \
   -p baud_rate:=115200 \
   -p data:=8 \
@@ -41,7 +41,7 @@ $ ros2 run serial serial_standalone \
 
 ```mermaid
 flowchart TB
-    cli["$ ros2 topic echo /serial/com1"] -. "DDS" .-> topic_serial[/ROS2 interfaces:\n/serial/com1/]
+    cli["$ ros2 topic echo /serial/com1"] -. "DDS" .-> topic_serial[/ROS2 interfaces:\n/serial/com1/.../]
     app["Your process"] -- "DDS\n(with context switch)" --> topic_serial
     subgraph serial["Process: serial_standalone"]
       topic_serial --> driver["Serial port driver"]
@@ -58,7 +58,7 @@ See an example of such a setup in the Modbus RTU package:
 
 ```mermaid
 flowchart TB
-    cli_serial["# Serial debugging\n$ ros2 topic echo /serial"] -. "DDS" ..-> topic_serial[/ROS2 interfaces:\n/serial/]
+    cli_serial["# Serial debugging\n$ ros2 topic echo /serial"] -. "DDS" ..-> topic_serial[/ROS2 interfaces:\n/serial/.../]
     subgraph modbus_exe["Your process"]
       subgraph serial["Library: serial"]
         topic_serial --> driver["Serial port driver"]

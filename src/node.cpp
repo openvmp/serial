@@ -22,7 +22,7 @@ Node::Node()
   // Should the burden be on the device driver side,
   // then the conditions for the serial line saturation will be met more often.
   intf_ros = std::shared_ptr<InterfaceRos>(
-      new InterfaceRos(this, topics_prefix_.as_string()));
+      new InterfaceRos(this, interface_prefix_.as_string()));
 
   worker_ = std::shared_ptr<Worker>(new Worker(intf_ros, port_settings_));
   intf_native = worker_;
@@ -46,8 +46,8 @@ void Node::init_parameters_() {
   this->get_parameter("bs", port_settings_->bs);
 
   // dds settings
-  this->declare_parameter("topics", "/serial");
-  this->get_parameter("topics", topics_prefix_);
+  this->declare_parameter("interface_prefix", "/serial");
+  this->get_parameter("interface_prefix", interface_prefix_);
 
   RCLCPP_INFO(this->get_logger(), "Serial node initialization complete for %s",
               port_settings_->dev_name.as_string().c_str());
