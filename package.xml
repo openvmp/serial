@@ -3,7 +3,7 @@
 <package format="3">
   <name>serial</name>
   <version>0.0.1</version>
-  <description>This packages implements a ROS2 node to configure and to communicate with serial ports on Linux.</description>
+  <description>Configure and communicate with serial ports on Linux.</description>
   <maintainer email="openvmp@proton.me">Roman Kuzmenko</maintainer>
   <license>Hippocratic License HL3-BDS-BOD-CL-ECO-FFD-MEDIA-MIL-SOC-SUP-SV</license>
 

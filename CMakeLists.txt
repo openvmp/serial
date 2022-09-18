@@ -10,10 +10,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-include_directories(
-  include
-)
-
 # Dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -28,35 +24,44 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 rosidl_get_typesupport_target(cpp_typesupport_target
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-set(serial_SOURCE_FILES
+  include_directories(
+    include
+  )
+  
+  set(project_SOURCE_FILES
   src/node.cpp
   src/worker.cpp
   src/port.cpp
   src/interface_ros.cpp
 )
 
-set(serial_DEPENDENCIES
+set(project_DEPENDENCIES
   rclcpp
   std_msgs
 )
 
 # Executable target
-add_executable(serial_standalone src/main.cpp ${serial_SOURCE_FILES})
-target_link_libraries(serial_standalone ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
-ament_target_dependencies(serial_standalone ${serial_DEPENDENCIES})
+add_executable(${PROJECT_NAME}_standalone src/main.cpp ${project_SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME}_standalone ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
+ament_target_dependencies(${PROJECT_NAME}_standalone ${project_DEPENDENCIES})
 install(TARGETS
-  serial_standalone
+  ${PROJECT_NAME}_standalone
   DESTINATION lib/${PROJECT_NAME}
 )
 
 # Library target
-add_library(serial_native ${serial_SOURCE_FILES})
-target_link_libraries(serial_native ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
-ament_target_dependencies(serial_native ${serial_DEPENDENCIES})
+add_library(${PROJECT_NAME}_native ${project_SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME}_native ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
+ament_target_dependencies(${PROJECT_NAME}_native ${project_DEPENDENCIES})
 ament_export_dependencies(rclcpp)
+ament_export_include_directories(include)
 install(TARGETS
-  serial_native
+  ${PROJECT_NAME}_native
   DESTINATION lib/${PROJECT_NAME}
+)
+install(
+  DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION include/${PROJECT_NAME}
 )
 # TODO(clairbee): ament_export_targets(export_serial HAS_LIBRARY_TARGET)
 

@@ -61,7 +61,7 @@ InterfaceRos::InterfaceRos(Node *node, const std::string &interface_prefix)
       std::bind(&InterfaceRos::inject_input_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
   inject_output = node->create_service<serial::srv::InjectOutput>(
-      interface_prefix + "inject/output",
+      interface_prefix + "/inject/output",
       std::bind(&InterfaceRos::inject_output_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
 }

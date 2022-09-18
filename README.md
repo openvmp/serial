@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This package is an ultimate C++ implementation of serial port driver for ROS2.
+This is an ultimate C++ implementation of serial port driver for ROS2.
 
 It can be used either as a library or a standalone process. In both cases it
 provides ROS2 interfaces for inter-process access, introspection and
