@@ -21,6 +21,7 @@ namespace serial {
 class PortSettings {
  public:
   rclcpp::Parameter dev_name;
+  rclcpp::Parameter skip_init;
   rclcpp::Parameter baud_rate;
   rclcpp::Parameter data;
   rclcpp::Parameter parity;

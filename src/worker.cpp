@@ -14,6 +14,7 @@
 #include "serial/utils.hpp"
 
 #define _BSD_SOURCE
+#include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -33,11 +34,25 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
     throw std::invalid_argument("failed to conigure the port");
   }
 
+  // Create a pipe to send signals into the worker threads
   if (::pipe(signal_) < 0) {
     ::close(fd_);
     fd_ = -1;
     throw std::invalid_argument("failed to creat a signalling channel");
   }
+
+  // Make the recieving side non-blocking
+  int flags = ::fcntl(signal_[0], F_GETFL, 0);
+  if (flags == -1) {
+    throw std::invalid_argument("failed to get the pipe descriptor attributes");
+  }
+
+  flags |= O_NONBLOCK;
+
+  if (::fcntl(signal_[0], F_SETFL, flags)) {
+    throw std::invalid_argument("failed to set the pipe descriptor attributes");
+  }
+
   thread_ = std::shared_ptr<std::thread>(new std::thread(&Worker::run_, this));
 
   RCLCPP_INFO(this->get_logger_(), "Serial node initialization complete for %s",
@@ -47,25 +62,36 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
 Worker::~Worker() { stop(); }
 
 void Worker::write(const std::string &msg) {
+  RCLCPP_DEBUG(get_logger_(), "write() with %lu bytes", msg.size());
+
   std::lock_guard<std::mutex> guard(send_queue_mutex_);
   send_queue_.push_back(std::pair<std::string, int>(msg, 0));
+
+  ::write(signal_[1], " ", 1);
 }
 
 void Worker::register_read_cb(void (*cb)(const std::string &, void *),
                               void *user_data) {
+  RCLCPP_DEBUG(get_logger_(), "register_read_cb()");
+
   std::lock_guard<std::mutex> guard(read_cb_mutex_);
   read_cb_ = cb;
   read_cb_user_data_ = user_data;
 }
 
 void Worker::inject_read(const std::string &msg) {
+  RCLCPP_DEBUG(get_logger_(), "inject_read() with %lu bytes", msg.size());
+
   std::lock_guard<std::mutex> guard(read_cb_mutex_);
-  read_cb_(msg, read_cb_user_data_);
+  if (read_cb_) {
+    read_cb_(msg, read_cb_user_data_);
+  }
 }
 
 void Worker::stop() {
   if (do_stop_) {
-    // already stopped
+    // already stopped, ping the worker thread just in case
+    ::write(signal_[1], " ", 1);
     return;
   }
 
@@ -80,30 +106,39 @@ void Worker::run_() {
   if (signal_[0] > max_fds) {
     max_fds = signal_[0];
   }
+  max_fds++;
 
   while (true) {
-    ::memset(&read_fds, 0, sizeof(read_fds));
-    ::memset(&write_fds, 0, sizeof(write_fds));
-    ::memset(&except_fds, 0, sizeof(except_fds));
-
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
+    FD_ZERO(&except_fds);
     FD_SET(fd_, &read_fds);
     FD_SET(signal_[0], &read_fds);
     if (send_queue_.size() > 0) {
       FD_SET(fd_, &write_fds);
     }
 
-    if (::select(max_fds, &read_fds, &write_fds, &except_fds, nullptr) < 0) {
+    int nevents =
+        ::select(max_fds, &read_fds, &write_fds, &except_fds, nullptr);
+    if (nevents < 0) {
       RCLCPP_ERROR(get_logger_(), "select() failed for %s",
                    settings_->dev_name.as_string().c_str());
       break;
     }
+    RCLCPP_DEBUG(get_logger_(), "woke up from select on %d events", nevents);
 
     if (FD_ISSET(signal_[0], &read_fds)) {
+      // consume up to 32 signals at a time
+      char c[32];
+      (void)read(signal_[0], &c[0], sizeof(c));
+
+      // check if it's a signal to terminate the threads
       if (do_stop_) {
         RCLCPP_INFO(get_logger_(), "exiting IO loop gracefully");
         break;
       }
 
+      // start processing the send queue
       send_queue_mutex_.lock();
       while (send_queue_.size() > 0) {
         auto next = send_queue_.begin();
@@ -115,6 +150,10 @@ void Worker::run_() {
         // Now attempt to write
         const char *read_pos = next->first.data() + next->second;
         const int remains_to_write = next->first.length() - next->second;
+
+        RCLCPP_DEBUG(get_logger_(), "attempting to output %d bytes",
+                     remains_to_write);
+
         int wrote = ::write(fd_, read_pos, remains_to_write);
         if (wrote < 0) {
           // TODO(clairbee): check the errno in this thread
@@ -128,6 +167,7 @@ void Worker::run_() {
           // TODO(clairbee): break the IO loop and re-open the file
           RCLCPP_ERROR(get_logger_(), "EOF while writing data: %d bytes",
                        remains_to_write);
+          send_queue_mutex_.lock();
           break;
         }
 
@@ -144,9 +184,8 @@ void Worker::run_() {
           send_queue_.erase(next);
         } else {
           next->second += wrote;
+          send_queue_mutex_.lock();
         }
-
-        send_queue_mutex_.lock();
       }
       send_queue_mutex_.unlock();
     }
@@ -172,7 +211,7 @@ void Worker::run_() {
       }
 
       if (total == 0) {
-        RCLCPP_INFO(get_logger_(), "exiting IO loop gdue to EOF");
+        RCLCPP_INFO(get_logger_(), "exiting IO loop due to EOF");
         break;
       }
 
@@ -180,11 +219,13 @@ void Worker::run_() {
         auto message = std_msgs::msg::String();
         message.data = std::string(buffer.get(), total);
 
+        RCLCPP_DEBUG(get_logger_(), "received input of %d bytes", total);
+
         read_cb_mutex_.lock();
         if (read_cb_ != nullptr) {
           // having pure pointers would improve performance here
           // by skipping data copying few lines above (message.data)
-          // but it would be against the religion of so many
+          // but, unfortunately, it would be against the religion of so many
           read_cb_(message.data, read_cb_user_data_);
         }
         read_cb_mutex_.unlock();

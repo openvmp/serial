@@ -22,8 +22,10 @@ namespace utils {
 static inline std::string bin2hex(const std::string &bin) {
   std::stringstream ss;
 
+  ss << std::hex << std::setfill('0') << std::setw(2);
+
   for (const auto &item : bin) {
-    ss << std::hex << int(item);
+    ss << int(item) << " ";
   }
   return ss.str();
 }

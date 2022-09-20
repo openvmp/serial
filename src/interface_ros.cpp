@@ -24,7 +24,7 @@ void InterfaceRos::inject_input_handler_(
     std::shared_ptr<serial::srv::InjectInput::Response> response) {
   (void)response;
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
-              "Incoming request to inject input\ndata: %s",
+              "Incoming request to inject input data: %s",
               utils::bin2hex(request->data).c_str());
 
   node_->intf_native->inject_read(request->data);
@@ -39,14 +39,10 @@ void InterfaceRos::inject_output_handler_(
     std::shared_ptr<serial::srv::InjectOutput::Response> response) {
   (void)response;
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
-              "Incoming request to inject output\ndata: %s",
+              "Incoming request to inject output data: %s",
               utils::bin2hex(request->data).c_str());
 
   node_->intf_native->write(request->data);
-
-  auto message = std_msgs::msg::String();
-  message.data = request->data;
-  inspect_output->publish(message);
 }
 
 InterfaceRos::InterfaceRos(Node *node, const std::string &interface_prefix)

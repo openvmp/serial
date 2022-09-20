@@ -27,7 +27,7 @@ class Worker final : public InterfaceNative {
  public:
   Worker(std::shared_ptr<InterfaceRos> intf_ros,
          std::shared_ptr<PortSettings> settings);
-  ~Worker();
+  virtual ~Worker();
 
   void stop();
 
