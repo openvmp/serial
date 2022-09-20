@@ -19,15 +19,15 @@ namespace serial {
 
 class InterfaceNative {
  public:
-  virtual void write(const std::string &) = 0;
+  virtual void output(const std::string &) = 0;
 
   // having pure pointers would improve performance here
   // but it would be against the religion of so many
-  virtual void register_read_cb(void (*)(const std::string &msg,
-                                         void *user_data),
-                                void *user_data) = 0;
+  virtual void register_input_cb(void (*)(const std::string &msg,
+                                          void *user_data),
+                                 void *user_data) = 0;
 
-  virtual void inject_read(const std::string &) = 0;
+  virtual void inject_input(const std::string &) = 0;
 };
 
 }  // namespace serial

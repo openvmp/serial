@@ -27,7 +27,7 @@ void InterfaceRos::inject_input_handler_(
               "Incoming request to inject input data: %s",
               utils::bin2hex(request->data).c_str());
 
-  node_->intf_native->inject_read(request->data);
+  node_->intf_native->inject_input(request->data);
 
   auto message = std_msgs::msg::String();
   message.data = request->data;
@@ -42,7 +42,7 @@ void InterfaceRos::inject_output_handler_(
               "Incoming request to inject output data: %s",
               utils::bin2hex(request->data).c_str());
 
-  node_->intf_native->write(request->data);
+  node_->intf_native->output(request->data);
 }
 
 InterfaceRos::InterfaceRos(Node *node, const std::string &interface_prefix)

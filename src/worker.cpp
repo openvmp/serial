@@ -27,8 +27,8 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
       fd_(-1),
       signal_{-1, -1},
       do_stop_(false),
-      read_cb_{nullptr},
-      read_cb_user_data_{nullptr} {
+      input_cb_{nullptr},
+      input_cb_user_data_{nullptr} {
   fd_ = settings->setup();
   if (fd_ < 0) {
     throw std::invalid_argument("failed to conigure the port");
@@ -61,30 +61,30 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
 
 Worker::~Worker() { stop(); }
 
-void Worker::write(const std::string &msg) {
-  RCLCPP_DEBUG(get_logger_(), "write() with %lu bytes", msg.size());
+void Worker::output(const std::string &msg) {
+  RCLCPP_DEBUG(get_logger_(), "output() with %lu bytes", msg.size());
 
-  std::lock_guard<std::mutex> guard(send_queue_mutex_);
-  send_queue_.push_back(std::pair<std::string, int>(msg, 0));
+  std::lock_guard<std::mutex> guard(output_queue_mutex_);
+  output_queue_.push_back(std::pair<std::string, int>(msg, 0));
 
   ::write(signal_[1], " ", 1);
 }
 
-void Worker::register_read_cb(void (*cb)(const std::string &, void *),
-                              void *user_data) {
-  RCLCPP_DEBUG(get_logger_(), "register_read_cb()");
+void Worker::register_input_cb(void (*cb)(const std::string &, void *),
+                               void *user_data) {
+  RCLCPP_DEBUG(get_logger_(), "register_input_cb()");
 
-  std::lock_guard<std::mutex> guard(read_cb_mutex_);
-  read_cb_ = cb;
-  read_cb_user_data_ = user_data;
+  std::lock_guard<std::mutex> guard(input_cb_mutex_);
+  input_cb_ = cb;
+  input_cb_user_data_ = user_data;
 }
 
-void Worker::inject_read(const std::string &msg) {
-  RCLCPP_DEBUG(get_logger_(), "inject_read() with %lu bytes", msg.size());
+void Worker::inject_input(const std::string &msg) {
+  RCLCPP_DEBUG(get_logger_(), "inject_input() with %lu bytes", msg.size());
 
-  std::lock_guard<std::mutex> guard(read_cb_mutex_);
-  if (read_cb_) {
-    read_cb_(msg, read_cb_user_data_);
+  std::lock_guard<std::mutex> guard(input_cb_mutex_);
+  if (input_cb_) {
+    input_cb_(msg, input_cb_user_data_);
   }
 }
 
@@ -114,7 +114,7 @@ void Worker::run_() {
     FD_ZERO(&except_fds);
     FD_SET(fd_, &read_fds);
     FD_SET(signal_[0], &read_fds);
-    if (send_queue_.size() > 0) {
+    if (output_queue_.size() > 0) {
       FD_SET(fd_, &write_fds);
     }
 
@@ -139,10 +139,10 @@ void Worker::run_() {
       }
 
       // start processing the send queue
-      send_queue_mutex_.lock();
-      while (send_queue_.size() > 0) {
-        auto next = send_queue_.begin();
-        send_queue_mutex_.unlock();
+      output_queue_mutex_.lock();
+      while (output_queue_.size() > 0) {
+        auto next = output_queue_.begin();
+        output_queue_mutex_.unlock();
         // We do not need to keep the lock during IO,
         // since the other threads use .push_back() and,
         // thus, do not invalidate this iterator.
@@ -167,7 +167,7 @@ void Worker::run_() {
           // TODO(clairbee): break the IO loop and re-open the file
           RCLCPP_ERROR(get_logger_(), "EOF while writing data: %d bytes",
                        remains_to_write);
-          send_queue_mutex_.lock();
+          output_queue_mutex_.lock();
           break;
         }
 
@@ -180,14 +180,14 @@ void Worker::run_() {
 
         // Advance the queue read position
         if (wrote == remains_to_write) {
-          send_queue_mutex_.lock();
-          send_queue_.erase(next);
+          output_queue_mutex_.lock();
+          output_queue_.erase(next);
         } else {
           next->second += wrote;
-          send_queue_mutex_.lock();
+          output_queue_mutex_.lock();
         }
       }
-      send_queue_mutex_.unlock();
+      output_queue_mutex_.unlock();
     }
 
     if (FD_ISSET(fd_, &except_fds)) {
@@ -221,14 +221,14 @@ void Worker::run_() {
 
         RCLCPP_DEBUG(get_logger_(), "received input of %d bytes", total);
 
-        read_cb_mutex_.lock();
-        if (read_cb_ != nullptr) {
+        input_cb_mutex_.lock();
+        if (input_cb_ != nullptr) {
           // having pure pointers would improve performance here
           // by skipping data copying few lines above (message.data)
           // but, unfortunately, it would be against the religion of so many
-          read_cb_(message.data, read_cb_user_data_);
+          input_cb_(message.data, input_cb_user_data_);
         }
-        read_cb_mutex_.unlock();
+        input_cb_mutex_.unlock();
 
         RCLCPP_INFO(get_logger_(), "Publishing: '%s'", message.data.c_str());
         intf_ros_->inspect_input->publish(message);

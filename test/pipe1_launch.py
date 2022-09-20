@@ -103,11 +103,11 @@ def generate_test_description():
     )
 
 
-class TestInjectWrite(unittest.TestCase):
+class TestInjectOutput(unittest.TestCase):
     def test_basic(self, proc_output):
         rclpy.init()
         try:
-            node = MakeWriterNode("test_node")
+            node = MakeTesterNode("test_node")
             node.subscribe(1)
             node.subscribe(2)
             node.subscribe(1, "output")
@@ -128,10 +128,10 @@ class TestInjectWrite(unittest.TestCase):
             _ignore = 1
 
 
-class MakeWriterNode(rclpyNode):
+class MakeTesterNode(rclpyNode):
     test_context = {}
 
-    def __init__(self, name="writer_node"):
+    def __init__(self, name="tester_node"):
         super().__init__(name)
 
     def _save(self, id, direction, msg):
