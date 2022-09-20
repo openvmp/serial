@@ -86,20 +86,20 @@ flowchart TB
         end
 
         subgraph services["Services: /serial"]
-          service_send[//inject/write/]
-          service_recv[//inject/read/]
+          service_send[//inject/output/]
+          service_recv[//inject/input/]
         end
       end
 
       subgraph worker["serial::Worker"]
-        send_queue["Send Queue"]
+        output_queue["Output Queue"]
         thread["Worker thread\nrunning select()"]
 
         subgraph interface_native["serial::InterfaceNative"]
-          subgraph register_read_cb["register_read_cb()"]
-            read_cb["read_cb()"]
+          subgraph register_input_cb["register_input_cb()"]
+            input_cb["input_cb()"]
           end
-          write("write()")
+          output("output()")
         end
 
         fd["File Descriptor"]
@@ -109,8 +109,8 @@ flowchart TB
     file{{"Character device"}}
 
     %% owner -- "Constructor\nwith parameters" ----> node
-    owner --> write --> send_queue
-    %% owner --> register_read_cb
+    owner --> output --> output_queue
+    %% owner --> register_input_cb
 
     external .-> published_input
     external .-> published_output
@@ -118,13 +118,13 @@ flowchart TB
     external .-> service_recv
 
     service_recv --> published_input
-    service_recv --> read_cb
+    service_recv --> input_cb
 
-    service_send --> send_queue
-    send_queue --> thread
+    service_send --> output_queue
+    output_queue --> thread
     thread --> published_input
     thread --> published_output
-    thread ---> read_cb --> owner
+    thread ---> input_cb --> owner
 
     file -- "input" ---> fd -- "input" ----> thread
     thread -- "output" --> fd -- "output" --> file
