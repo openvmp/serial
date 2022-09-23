@@ -29,7 +29,7 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
       do_stop_(false),
       input_cb_{nullptr},
       input_cb_user_data_{nullptr} {
-  fd_ = settings->setup();
+  fd_ = settings->setup(fd_);
   if (fd_ < 0) {
     throw std::invalid_argument("failed to conigure the port");
   }
@@ -55,7 +55,7 @@ Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
 
   thread_ = std::shared_ptr<std::thread>(new std::thread(&Worker::run_, this));
 
-  RCLCPP_INFO(this->get_logger_(), "Serial node initialization complete for %s",
+  RCLCPP_INFO(this->get_logger_(), "Worker initialization complete for %s",
               settings_->dev_name.as_string().c_str());
 }
 
@@ -230,7 +230,8 @@ void Worker::run_() {
         }
         input_cb_mutex_.unlock();
 
-        RCLCPP_INFO(get_logger_(), "Publishing: '%s'", message.data.c_str());
+        RCLCPP_INFO(get_logger_(), "Publishing received: '%s'",
+                    utils::bin2hex(message.data).c_str());
         intf_ros_->inspect_input->publish(message);
       }
     }

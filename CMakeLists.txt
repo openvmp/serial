@@ -24,11 +24,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 rosidl_get_typesupport_target(cpp_typesupport_target
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-  include_directories(
-    include
-  )
+include_directories(
+  include
+)
   
-  set(project_SOURCE_FILES
+set(project_SOURCE_FILES
   src/node.cpp
   src/worker.cpp
   src/port.cpp
@@ -53,17 +53,18 @@ install(TARGETS
 add_library(${PROJECT_NAME}_native ${project_SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME}_native ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
 ament_target_dependencies(${PROJECT_NAME}_native ${project_DEPENDENCIES})
+ament_export_targets(${PROJECT_NAME}_native_library HAS_LIBRARY_TARGET)
 ament_export_dependencies(rclcpp)
 ament_export_include_directories(include)
-install(TARGETS
-  ${PROJECT_NAME}_native
-  DESTINATION lib/${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}_native
+  EXPORT ${PROJECT_NAME}_native_library
+  DESTINATION lib
 )
 install(
   DIRECTORY include/${PROJECT_NAME}/
   DESTINATION include/${PROJECT_NAME}
 )
-# TODO(clairbee): ament_export_targets(export_serial HAS_LIBRARY_TARGET)
+
 
 # Testing
 if(BUILD_TESTING)

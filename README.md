@@ -1,6 +1,8 @@
-# ROS2 serial
+# OpenVMP
 
-## Introduction
+[![Licence](license.svg)](https://opensource.org/licenses/Apache-2.0)
+
+## ROS2 serial driver
 
 This is an ultimate C++ implementation of serial port driver for ROS2.
 
@@ -13,8 +15,6 @@ ensuring maximum performance.
 
 It's a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
 But it's designed to be universal and usable everywhere.
-
-## User's guide
 
 ### Basic setup
 

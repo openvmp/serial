@@ -22,7 +22,11 @@
 
 namespace serial {
 
-int PortSettings::setup() {
+int PortSettings::setup(int old_fd) {
+  if (old_fd != -1) {
+    close(old_fd);
+  }
+
   int fd = ::open(dev_name.as_string().data(), O_RDWR);
   if (fd < 0) {
     throw std::invalid_argument("failed to open the device");
@@ -138,21 +142,28 @@ int PortSettings::setup() {
 
     // Flow control
     if (flow_control.as_bool()) {
-      tty.c_cflag |= CRTSCTS;
+      tty.c_cflag |= CRTSCTS;                 // Turn on h/w flow control
+      tty.c_iflag |= (IXON | IXOFF | IXANY);  // Turn on s/w flow ctrl
     } else {
       tty.c_cflag &= ~CRTSCTS;
+      tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off s/w flow ctrl
     }
 
     tty.c_cflag |= CREAD | CLOCAL;
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
     // Setting both to 0 will give a non-blocking read
     tty.c_cc[VTIME] = 0;
     tty.c_cc[VMIN] = 0;
     tty.c_lflag &= ~ICANON;  // Turn off canonical input
     tty.c_lflag &= ~(ECHO);  // Turn off echo
+    tty.c_lflag &= ~ECHOE;   // Disable erasure
+    tty.c_lflag &= ~ECHONL;  // Disable new-line echo
     tty.c_lflag &= ~ISIG;  // Disables recognition of INTR (interrupt), QUIT and
                            // SUSP (suspend) characters
+    tty.c_oflag &= ~OPOST;  // Prevent special interpretation of output bytes
+                            // (e.g. newline chars)
+    tty.c_oflag &=
+        ~ONLCR;  // Prevent conversion of newline to carriage return/line feed
 
     // Set the terminal attributes
     ::tcflush(fd, TCIFLUSH);

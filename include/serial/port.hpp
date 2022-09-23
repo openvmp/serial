@@ -31,7 +31,7 @@ class PortSettings {
   static const int BUFFER_SIZE_MAX = 1048576;  // 1MB
   rclcpp::Parameter bs;
 
-  int setup();
+  int setup(int old_fd);
 };
 
 }  // namespace serial

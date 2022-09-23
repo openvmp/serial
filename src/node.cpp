@@ -33,10 +33,10 @@ void Node::init_parameters_() {
   this->declare_parameter("dev_name", "/dev/ttyS0");
   this->declare_parameter("skip_init", false);
   this->declare_parameter("baud_rate", 115200);
-  this->declare_parameter("data", 1);
+  this->declare_parameter("data", 8);
   this->declare_parameter("parity", false);
   this->declare_parameter("stop", 1);
-  this->declare_parameter("flow_control", false);
+  this->declare_parameter("flow_control", true);
   this->declare_parameter("bs", 1024);
   this->get_parameter("dev_name", port_settings_->dev_name);
   this->get_parameter("skip_init", port_settings_->skip_init);

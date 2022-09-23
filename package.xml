@@ -5,7 +5,7 @@
   <version>0.0.1</version>
   <description>Configure and communicate with serial ports on Linux.</description>
   <maintainer email="openvmp@proton.me">Roman Kuzmenko</maintainer>
-  <license>Hippocratic License HL3-BDS-BOD-CL-ECO-FFD-MEDIA-MIL-SOC-SUP-SV</license>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>
