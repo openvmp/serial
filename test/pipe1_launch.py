@@ -51,14 +51,14 @@ def generate_test_description():
         # arguments=["--ros-args", "--log-level", "debug"],
         parameters=[
             {
-                "interface_prefix": "/serial/com1",
-                "dev_name": TTY1,
-                # "skip_init": True,
-                "baud_rate": 115200,
-                "data": 8,
-                "parity": False,
-                "stop": 1,
-                "flow_control": True,
+                "serial_prefix": "/serial/com1",
+                "serial_dev_name": TTY1,
+                # "serial_skip_init": True,
+                "serial_baud_rate": 115200,
+                "serial_data": 8,
+                "serial_parity": False,
+                "serial_stop": 1,
+                "serial_flow_control": True,
             }
         ],
         output="screen",
@@ -70,14 +70,14 @@ def generate_test_description():
         # arguments=["--ros-args", "--log-level", "debug"],
         parameters=[
             {
-                "interface_prefix": "/serial/com2",
-                "dev_name": TTY2,
-                # "skip_init": True,
-                "baud_rate": 115200,
-                "data": 8,
-                "parity": False,
-                "stop": 1,
-                "flow_control": True,
+                "serial_prefix": "/serial/com2",
+                "serial_dev_name": TTY2,
+                # "serial_skip_init": True,
+                "serial_baud_rate": 115200,
+                "serial_data": 8,
+                "serial_parity": False,
+                "serial_stop": 1,
+                "serial_flow_control": True,
             }
         ],
         output="screen",
@@ -107,6 +107,7 @@ class TestInjectOutput(unittest.TestCase):
     def test_basic(self, proc_output):
         rclpy.init()
         try:
+            sleep(3)
             node = MakeTesterNode("test_node")
             node.subscribe(1)
             node.subscribe(2)

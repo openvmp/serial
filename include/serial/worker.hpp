@@ -17,16 +17,15 @@
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "serial/interface.hpp"
 #include "serial/interface_native.hpp"
-#include "serial/interface_ros.hpp"
 #include "serial/port.hpp"
 
 namespace serial {
 
 class Worker final : public InterfaceNative {
  public:
-  Worker(std::shared_ptr<InterfaceRos> intf_ros,
-         std::shared_ptr<PortSettings> settings);
+  Worker(Interface *intf, std::shared_ptr<PortSettings> settings);
   virtual ~Worker();
 
   void stop();
@@ -41,7 +40,7 @@ class Worker final : public InterfaceNative {
 
  private:
   // port
-  std::shared_ptr<InterfaceRos> intf_ros_;
+  Interface *intf_;
   std::shared_ptr<PortSettings> settings_;
   int fd_;
 

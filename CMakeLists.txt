@@ -32,7 +32,7 @@ set(project_SOURCE_FILES
   src/node.cpp
   src/worker.cpp
   src/port.cpp
-  src/interface_ros.cpp
+  src/interface.cpp
 )
 
 set(project_DEPENDENCIES

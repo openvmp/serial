@@ -16,10 +16,7 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "serial/interface_ros.hpp"
-#include "serial/port.hpp"
-#include "serial/worker.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "serial/interface.hpp"
 
 namespace serial {
 
@@ -27,22 +24,8 @@ class Node : public rclcpp::Node {
  public:
   Node();
 
-  void init_parameters_();
-
-  std::shared_ptr<InterfaceRos> intf_ros;
-  std::shared_ptr<InterfaceNative> intf_native;
-
  private:
-  // node parameters
-  std::shared_ptr<PortSettings> port_settings_;
-  rclcpp::Parameter interface_prefix_;
-
-  // topics
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_input_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_output_;
-
-  // port worker
-  std::shared_ptr<Worker> worker_;
+  std::shared_ptr<Interface> interface_;
 };
 
 }  // namespace serial

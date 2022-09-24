@@ -11,6 +11,7 @@
 
 #include "serial/worker.hpp"
 
+#include "serial/interface.hpp"
 #include "serial/utils.hpp"
 
 #define _BSD_SOURCE
@@ -20,9 +21,8 @@
 
 namespace serial {
 
-Worker::Worker(std::shared_ptr<InterfaceRos> intf_ros,
-               std::shared_ptr<PortSettings> settings)
-    : intf_ros_(intf_ros),
+Worker::Worker(Interface *intf, std::shared_ptr<PortSettings> settings)
+    : intf_(intf),
       settings_(settings),
       fd_(-1),
       signal_{-1, -1},
@@ -161,6 +161,7 @@ void Worker::run_() {
           // TODO(clairbee):   break the IO loop and re-open the file
           RCLCPP_INFO(get_logger_(), "error while writing data: %d bytes",
                       remains_to_write);
+          output_queue_mutex_.lock();
           continue;  // hoping it was EAGAIN
         }
         if (wrote == 0) {
@@ -176,7 +177,7 @@ void Worker::run_() {
         message.data = std::string(read_pos, wrote);
         RCLCPP_INFO(get_logger_(), "Publishing written data: '%s'",
                     utils::bin2hex(message.data).c_str());
-        intf_ros_->inspect_output->publish(message);
+        intf_->inspect_output->publish(message);
 
         // Advance the queue read position
         if (wrote == remains_to_write) {
@@ -232,7 +233,7 @@ void Worker::run_() {
 
         RCLCPP_INFO(get_logger_(), "Publishing received: '%s'",
                     utils::bin2hex(message.data).c_str());
-        intf_ros_->inspect_input->publish(message);
+        intf_->inspect_input->publish(message);
       }
     }
   }

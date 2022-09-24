@@ -1,0 +1,76 @@
+/*
+ * Copyright 2022 OpenVMP Authors
+ *
+ * Licensed under HIPPOCRATIC LICENSE Version 3.0.
+ * Generated using
+ * https://firstdonoharm.dev/version/3/0/bds-bod-cl-eco-ffd-media-mil-soc-sup-sv.md
+ * See https://github.com/openvmp/openvmp/blob/main/docs/License.md for more
+ * details.
+ *
+ */
+
+#ifndef OPENVMP_SERIAL_INTERFACE_H
+#define OPENVMP_SERIAL_INTERFACE_H
+
+#include <memory>
+#include <string>
+
+#include "rclcpp/rclcpp.hpp"
+#include "serial/interface_native.hpp"
+#include "serial/port.hpp"
+#include "serial/srv/inject_input.hpp"
+#include "serial/srv/inject_output.hpp"
+#include "std_msgs/msg/string.hpp"
+
+namespace serial {
+
+class Worker;
+
+class Interface final : public InterfaceNative {
+ public:
+  Interface(rclcpp::Node *node);
+  ~Interface() {}
+
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr inspect_output;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr inspect_input;
+
+  virtual void output(const std::string &msg) override;
+
+  // having pure pointers would improve performance here
+  // but it would be against the religion of so many
+  virtual void register_input_cb(void (*input_cb)(const std::string &msg,
+                                                  void *user_data),
+                                 void *user_data) override;
+
+  virtual void inject_input(const std::string &msg) override;
+
+ private:
+  rclcpp::Node *node_;
+
+  // node parameters
+  rclcpp::Parameter interface_prefix_;
+  std::shared_ptr<PortSettings> port_settings_;
+
+  // topics
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_input_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_output_;
+
+  rclcpp::Service<serial::srv::InjectInput>::SharedPtr inject_input_;
+  rclcpp::Service<serial::srv::InjectOutput>::SharedPtr inject_output_;
+
+  void inject_input_handler_(
+      const std::shared_ptr<serial::srv::InjectInput::Request> request,
+      std::shared_ptr<serial::srv::InjectInput::Response> response);
+  void inject_output_handler_(
+      const std::shared_ptr<serial::srv::InjectOutput::Request> request,
+      std::shared_ptr<serial::srv::InjectOutput::Response> response);
+
+  const rclcpp::Logger get_logger_();
+
+  // port worker
+  std::shared_ptr<Worker> worker_;
+};
+
+}  // namespace serial
+
+#endif  // OPENVMP_SERIAL_INTERFACE_H
