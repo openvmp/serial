@@ -14,7 +14,7 @@ the I/O directions, minimizing data loses and blocking behavior,
 ensuring maximum performance.
 
 It's a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
-But it's designed to be universal and usable everywhere.
+But it's designed to be universal and usable outside of OpenVMP as well.
 
 ### Basic setup
 
@@ -30,13 +30,13 @@ or
 $ ros2 run serial serial_standalone \
   --ros-args \
   --remap serial:__node:=serial_com1 \
-  -p interface_prefix:=/serial/com1 \
-  -p dev_name:=/dev/ttyS0 \
-  -p baud_rate:=115200 \
-  -p data:=8 \
-  -p parity:=false \
-  -p stop:=1 \
-  -p flow_control:=true
+  -p serial_prefix:=/serial/com1 \
+  -p serial_dev_name:=/dev/ttyS0 \
+  -p serial_baud_rate:=115200 \
+  -p serial_data:=8 \
+  -p serial_parity:=false \
+  -p serial_stop:=1 \
+  -p serial_flow_control:=true
 ```
 
 ```mermaid
@@ -51,9 +51,11 @@ flowchart TB
 
 ### Advanced setup
 
-The more advanced setup is to initialize it as a node in the executable that will be communicating with it all the time (e.g. an RS485 implementation).
+The more advanced setup is to initialize it as a separate node in the very executable which will be communicating with the port all the time
+(e.g. a MODBUS RTU implementation).
 
-This setup allows DDS to forward the messages between nodes without context switches should your DDS implementation support this.
+This setup allows DDS to forward the messages between nodes
+without context switches should your DDS implementation support that.
 See an example of such a setup in the Modbus RTU package:
 
 ```mermaid
@@ -79,7 +81,7 @@ flowchart TB
 
     subgraph node["serial::Node"]
 
-      subgraph interface_ros2["serial::InterfaceRos"]
+      subgraph interface_ros2["serial::InterfaceRemote"]
         subgraph topics["Topics: /serial"]
           published_input[//inspect/input/]
           published_output[//inspect/output/]
@@ -95,7 +97,7 @@ flowchart TB
         output_queue["Output Queue"]
         thread["Worker thread\nrunning select()"]
 
-        subgraph interface_native["serial::InterfaceNative"]
+        subgraph interface_native["serial::Implementation"]
           subgraph register_input_cb["register_input_cb()"]
             input_cb["input_cb()"]
           end

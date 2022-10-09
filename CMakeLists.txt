@@ -32,7 +32,10 @@ set(project_SOURCE_FILES
   src/node.cpp
   src/worker.cpp
   src/port.cpp
+  src/implementation.cpp
   src/interface.cpp
+  src/interface_remote.cpp
+  src/factory.cpp
 )
 
 set(project_DEPENDENCIES

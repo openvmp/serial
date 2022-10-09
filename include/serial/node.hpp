@@ -14,7 +14,7 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "serial/interface.hpp"
+#include "serial/implementation.hpp"
 
 namespace serial {
 
@@ -23,7 +23,7 @@ class Node : public rclcpp::Node {
   Node();
 
  private:
-  std::shared_ptr<Interface> interface_;
+  std::shared_ptr<Implementation> impl_;
 };
 
 }  // namespace serial

@@ -12,7 +12,7 @@
 namespace serial {
 
 Node::Node() : rclcpp::Node::Node("serial") {
-  interface_ = std::make_shared<Interface>(this);
+  impl_ = std::make_shared<Implementation>(this);
 }
 
 }  // namespace serial

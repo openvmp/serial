@@ -19,8 +19,8 @@
 
 namespace serial {
 
-Worker::Worker(Interface *intf, std::shared_ptr<PortSettings> settings)
-    : intf_(intf),
+Worker::Worker(Implementation *impl, std::shared_ptr<PortSettings> settings)
+    : impl_(impl),
       settings_(settings),
       fd_(-1),
       signal_{-1, -1},
@@ -175,7 +175,7 @@ void Worker::run_() {
         message.data = std::string(read_pos, wrote);
         RCLCPP_INFO(get_logger_(), "Publishing written data: '%s'",
                     utils::bin2hex(message.data).c_str());
-        intf_->inspect_output->publish(message);
+        impl_->inspect_output->publish(message);
 
         // Advance the queue read position
         if (wrote == remains_to_write) {
@@ -231,7 +231,7 @@ void Worker::run_() {
 
         RCLCPP_INFO(get_logger_(), "Publishing received: '%s'",
                     utils::bin2hex(message.data).c_str());
-        intf_->inspect_input->publish(message);
+        impl_->inspect_input->publish(message);
       }
     }
   }

@@ -15,15 +15,15 @@
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "serial/implementation.hpp"
 #include "serial/interface.hpp"
-#include "serial/interface_native.hpp"
 #include "serial/port.hpp"
 
 namespace serial {
 
-class Worker final : public InterfaceNative {
+class Worker final {
  public:
-  Worker(Interface *intf, std::shared_ptr<PortSettings> settings);
+  Worker(Implementation *impl, std::shared_ptr<PortSettings> settings);
   virtual ~Worker();
 
   void stop();
@@ -31,14 +31,14 @@ class Worker final : public InterfaceNative {
   /// @brief Place the byte array into the send queue for this serial line
   /// @param msg String object containing the byte array to be written to the
   ///            serial line
-  void output(const std::string &msg) override;
+  void output(const std::string &msg);
   void register_input_cb(void (*cb)(const std::string &, void *),
-                         void *user_data) override;
-  void inject_input(const std::string &msg) override;
+                         void *user_data);
+  void inject_input(const std::string &msg);
 
  private:
   // port
-  Interface *intf_;
+  Implementation *impl_;
   std::shared_ptr<PortSettings> settings_;
   int fd_;
 

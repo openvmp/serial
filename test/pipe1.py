@@ -1,15 +1,17 @@
+import sys
+
+sys.path.append("test/lib")
+
+from serial_test import SerialTesterNode
+
 import os
 import tempfile
 from time import sleep
 
-import rclpy
-from rclpy.node import Node as rclpyNode
-from serial.srv import InjectOutput
-import std_msgs.msg
-
-
 import pytest
 import unittest
+
+import rclpy
 from launch import LaunchDescription
 from launch.actions import (
     RegisterEventHandler,
@@ -108,14 +110,18 @@ class TestInjectOutput(unittest.TestCase):
         rclpy.init()
         try:
             sleep(3)
-            node = MakeTesterNode("test_node")
+            node = SerialTesterNode("test_node")
             node.subscribe(1)
             node.subscribe(2)
             node.subscribe(1, "output")
             node.subscribe(2, "output")
 
-            response = node.inject(1)
-            assert response, "Could not inject!"
+            future = node.inject(1)
+            rclpy.spin_until_future_complete(node, future, timeout_sec=10.0)
+
+            assert future.done(), "Client request timed out"
+            _response = future.result()
+            # assert response, "Could not inject!"
             sleep(3)
 
             assert node.test_context[1]["output"] == "test", (
@@ -127,51 +133,3 @@ class TestInjectOutput(unittest.TestCase):
         finally:
             rclpy.shutdown()
             _ignore = 1
-
-
-class MakeTesterNode(rclpyNode):
-    test_context = {}
-
-    def __init__(self, name="tester_node"):
-        super().__init__(name)
-
-    def _save(self, id, direction, msg):
-        print("Data received on com" + str(id) + " on " + direction)
-        if not id in self.test_context:
-            self.test_context[id] = {}
-        if not direction in self.test_context[id]:
-            self.test_context[id][direction] = ""
-        self.test_context[id][direction] += msg.data
-
-    def subscribe(
-        self,
-        id=1,
-        direction="input",
-    ):
-        this_node = self
-        subscription = self.create_subscription(
-            std_msgs.msg.String,
-            "/serial/com" + str(id) + "/inspect/" + direction,
-            lambda msg: this_node._save(id, direction, msg),
-            10,
-        )
-        return subscription
-
-    def inject(self, id=1, direction="output", text="test", timeout=10.0):
-        client = self.create_client(
-            InjectOutput, "/serial/com" + str(id) + "/inject/" + str(direction)
-        )
-        ready = client.wait_for_service(timeout_sec=timeout)
-        if not ready:
-            raise RuntimeError("Wait for service timed out")
-
-        request = InjectOutput.Request()
-        request.data = text
-        future = client.call_async(request)
-        rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
-
-        assert future.done(), "Client request timed out"
-
-        _response = future.result()
-
-        return True
