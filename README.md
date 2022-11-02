@@ -2,6 +2,9 @@
 
 [![License](./license.svg)](./LICENSE.txt)
 
+This package is a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
+But it's designed to be universal and usable independently from the rest of OpenVMP or in a combination with select OpenVMP packages.
+
 ## ROS2 serial driver
 
 This is an ultimate C++ implementation of serial port driver for ROS2.
@@ -13,8 +16,6 @@ It performs wisely in case of serial line saturation in any of
 the I/O directions, minimizing data loses and blocking behavior,
 ensuring maximum performance.
 
-It's a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
-But it's designed to be universal and usable outside of OpenVMP as well.
 
 ### Basic setup
 
