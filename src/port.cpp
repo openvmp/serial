@@ -172,7 +172,9 @@ int PortSettings::setup(int old_fd) {
   }
 
   // Get the file descriptor attributes
+#if defined(F_NOCACHE)
   ::fcntl(fd, F_NOCACHE, 1);
+#endif
   int flags = ::fcntl(fd, F_GETFL, 0);
   if (flags == -1) {
     ::close(fd);
