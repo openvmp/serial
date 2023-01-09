@@ -115,8 +115,10 @@ class TestInjectOutput(unittest.TestCase):
             node.subscribe(2)
             node.subscribe(1, "output")
             node.subscribe(2, "output")
+            sleep(1)
 
             future = node.inject(1)
+            sleep(1)
             rclpy.spin_until_future_complete(node, future, timeout_sec=10.0)
 
             assert future.done(), "Client request timed out"
