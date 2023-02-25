@@ -17,7 +17,7 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   callback_group_ =
       node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
-  auto prefix = interface_prefix_.as_string();
+  auto prefix = get_prefix_();
 
   RCLCPP_DEBUG(node_->get_logger(),
                "serial::RemoteInterface::RemoteInterface(): Connecting to the "

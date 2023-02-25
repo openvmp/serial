@@ -39,6 +39,10 @@ class Interface {
 
  protected:
   rclcpp::Node *node_;
+
+  std::string get_prefix_();
+
+ private:
   rclcpp::Parameter interface_prefix_;
 };
 

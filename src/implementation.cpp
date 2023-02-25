@@ -36,17 +36,19 @@ Implementation::Implementation(rclcpp::Node *node)
   RCLCPP_INFO(node_->get_logger(), "Serial node initialization complete for %s",
               port_settings_->dev_name.as_string().c_str());
 
+  auto prefix = get_prefix_();
+
   inspect_input = node->create_publisher<std_msgs::msg::String>(
-      interface_prefix_.as_string() + SERIAL_TOPIC_INPUT, 10);
+      prefix + SERIAL_TOPIC_INPUT, 10);
   inspect_output = node->create_publisher<std_msgs::msg::String>(
-      interface_prefix_.as_string() + SERIAL_TOPIC_OUTPUT, 10);
+      prefix + SERIAL_TOPIC_OUTPUT, 10);;
 
   inject_input_ = node->create_service<serial::srv::InjectInput>(
-      interface_prefix_.as_string() + SERIAL_SERVICE_INJECT_INPUT,
+      prefix + SERIAL_SERVICE_INJECT_INPUT,
       std::bind(&Implementation::inject_input_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
   inject_output_ = node->create_service<serial::srv::InjectOutput>(
-      interface_prefix_.as_string() + SERIAL_SERVICE_INJECT_OUTPUT,
+      prefix + SERIAL_SERVICE_INJECT_OUTPUT,
       std::bind(&Implementation::inject_output_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
 
@@ -98,7 +100,7 @@ void Implementation::inject_input(const std::string &msg) {
 }
 
 const rclcpp::Logger Implementation::get_logger_() {
-  return rclcpp::get_logger(interface_prefix_.as_string());
+  return rclcpp::get_logger(get_prefix_());
 }
 
 }  // namespace serial
