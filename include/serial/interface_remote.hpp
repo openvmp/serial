@@ -23,7 +23,7 @@
 
 namespace serial {
 
-class RemoteInterface : public Interface {
+class RemoteInterface final : public Interface {
  public:
   RemoteInterface(rclcpp::Node *node);
   virtual ~RemoteInterface() {}
@@ -38,7 +38,7 @@ class RemoteInterface : public Interface {
                                  void *user_data) override;
 
  protected:
-  void input_handler(const std_msgs::msg::String::SharedPtr data);
+  void input_handler(const std_msgs::msg::String::SharedPtr);
   // void output_handler(const std_msgs::msg::String &data);
 
  private:
