@@ -39,9 +39,14 @@ Implementation::Implementation(rclcpp::Node *node)
   auto prefix = get_prefix_();
 
   inspect_input = node->create_publisher<std_msgs::msg::String>(
-      prefix + SERIAL_TOPIC_INPUT, 10);
+      prefix + SERIAL_TOPIC_INPUT,
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   inspect_output = node->create_publisher<std_msgs::msg::String>(
-      prefix + SERIAL_TOPIC_OUTPUT, 10);;
+      prefix + SERIAL_TOPIC_OUTPUT,
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+  ;
 
   inject_input_ = node->create_service<serial::srv::InjectInput>(
       prefix + SERIAL_SERVICE_INJECT_INPUT,
