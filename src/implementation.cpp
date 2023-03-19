@@ -38,14 +38,24 @@ Implementation::Implementation(rclcpp::Node *node)
 
   auto prefix = get_prefix_();
 
+  rmw_qos_profile_t rmw = {
+      .history = rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+      .depth = 1,
+      .reliability =
+          rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT,
+      .durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
+      .deadline = {0, 50000000},
+      .lifespan = {0, 50000000},
+      .liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC,
+      .liveliness_lease_duration = {0, 0},
+      .avoid_ros_namespace_conventions = false,
+  };
+  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw), rmw);
+
   inspect_input = node->create_publisher<std_msgs::msg::String>(
-      prefix + SERIAL_TOPIC_INPUT,
-      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
-          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+      prefix + SERIAL_TOPIC_INPUT, qos);
   inspect_output = node->create_publisher<std_msgs::msg::String>(
-      prefix + SERIAL_TOPIC_OUTPUT,
-      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
-          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+      prefix + SERIAL_TOPIC_OUTPUT, qos);
   ;
 
   inject_input_ = node->create_service<serial::srv::InjectInput>(
