@@ -7,7 +7,7 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #include "serial/port.hpp"
 
 #include <errno.h>
