@@ -140,10 +140,13 @@ int PortSettings::setup(int old_fd) {
 
     // Flow control
     if (flow_control.as_bool()) {
-      tty.c_cflag |= CRTSCTS;                 // Turn on h/w flow control
-      tty.c_iflag |= (IXON | IXOFF | IXANY);  // Turn on s/w flow ctrl
+      tty.c_cflag |= CRTSCTS;  // Turn on h/w flow control
     } else {
       tty.c_cflag &= ~CRTSCTS;
+    }
+    if (sw_flow_control.as_bool()) {
+      tty.c_iflag |= (IXON | IXOFF | IXANY);  // Turn on s/w flow ctrl
+    } else {
       tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off s/w flow ctrl
     }
 

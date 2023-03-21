@@ -22,7 +22,8 @@ Implementation::Implementation(rclcpp::Node *node)
   node_->declare_parameter("serial_data", 8);
   node_->declare_parameter("serial_parity", false);
   node_->declare_parameter("serial_stop", 1);
-  node_->declare_parameter("serial_flow_control", true);
+  node_->declare_parameter("serial_flow_control", false);
+  node_->declare_parameter("serial_sw_flow_control", false);
   node_->declare_parameter("serial_bs", 1024);
   node_->get_parameter("serial_dev_name", port_settings_->dev_name);
   node_->get_parameter("serial_skip_init", port_settings_->skip_init);
@@ -31,6 +32,8 @@ Implementation::Implementation(rclcpp::Node *node)
   node_->get_parameter("serial_stop", port_settings_->stop);
   node_->get_parameter("serial_parity", port_settings_->parity);
   node_->get_parameter("serial_flow_control", port_settings_->flow_control);
+  node_->get_parameter("serial_sw_flow_control",
+                       port_settings_->sw_flow_control);
   node_->get_parameter("serial_bs", port_settings_->bs);
 
   RCLCPP_INFO(node_->get_logger(), "Serial node initialization complete for %s",

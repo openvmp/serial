@@ -17,6 +17,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#ifndef DEBUG
+#undef RCLCPP_DEBUG
+#define RCLCPP_DEBUG(...)
+#endif
+
 namespace serial {
 
 Worker::Worker(Implementation *impl, std::shared_ptr<PortSettings> settings)

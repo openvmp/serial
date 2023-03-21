@@ -25,6 +25,7 @@ class PortSettings {
   rclcpp::Parameter parity;
   rclcpp::Parameter stop;
   rclcpp::Parameter flow_control;
+  rclcpp::Parameter sw_flow_control;
 
   static const int BUFFER_SIZE_MAX = 1048576;  // 1MB
   rclcpp::Parameter bs;
