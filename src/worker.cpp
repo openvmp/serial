@@ -178,8 +178,8 @@ void Worker::run_() {
         // Now publish what is written successfully
         auto message = std_msgs::msg::String();
         message.data = std::string(read_pos, wrote);
-        RCLCPP_INFO(get_logger_(), "Publishing written data: '%s'",
-                    utils::bin2hex(message.data).c_str());
+        RCLCPP_DEBUG(get_logger_(), "Publishing written data: '%s'",
+                     utils::bin2hex(message.data).c_str());
         impl_->inspect_output->publish(message);
 
         // Advance the queue read position
@@ -234,8 +234,8 @@ void Worker::run_() {
         }
         input_cb_mutex_.unlock();
 
-        RCLCPP_INFO(get_logger_(), "Publishing received: '%s'",
-                    utils::bin2hex(message.data).c_str());
+        RCLCPP_DEBUG(get_logger_(), "Publishing received: '%s'",
+                     utils::bin2hex(message.data).c_str());
         impl_->inspect_input->publish(message);
       }
     }
