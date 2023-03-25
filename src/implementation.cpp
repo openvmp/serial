@@ -7,12 +7,12 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "serial/implementation.hpp"
+#include "ros2_serial/implementation.hpp"
 
-#include "serial/utils.hpp"
-#include "serial/worker.hpp"
+#include "ros2_serial/utils.hpp"
+#include "ros2_serial/worker.hpp"
 
-namespace serial {
+namespace ros2_serial {
 
 Implementation::Implementation(rclcpp::Node *node)
     : Interface(node), port_settings_(new PortSettings()) {
@@ -61,11 +61,11 @@ Implementation::Implementation(rclcpp::Node *node)
       prefix + SERIAL_TOPIC_OUTPUT, qos);
   ;
 
-  inject_input_ = node->create_service<serial::srv::InjectInput>(
+  inject_input_ = node->create_service<srv::InjectInput>(
       prefix + SERIAL_SERVICE_INJECT_INPUT,
       std::bind(&Implementation::inject_input_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
-  inject_output_ = node->create_service<serial::srv::InjectOutput>(
+  inject_output_ = node->create_service<srv::InjectOutput>(
       prefix + SERIAL_SERVICE_INJECT_OUTPUT,
       std::bind(&Implementation::inject_output_handler_, this,
                 std::placeholders::_1, std::placeholders::_2));
@@ -78,8 +78,8 @@ Implementation::Implementation(rclcpp::Node *node)
 }
 
 void Implementation::inject_input_handler_(
-    const std::shared_ptr<serial::srv::InjectInput::Request> request,
-    std::shared_ptr<serial::srv::InjectInput::Response> response) {
+    const std::shared_ptr<srv::InjectInput::Request> request,
+    std::shared_ptr<srv::InjectInput::Response> response) {
   (void)response;
 
   RCLCPP_INFO(this->get_logger_(), "Incoming request to inject input data: %s",
@@ -93,8 +93,8 @@ void Implementation::inject_input_handler_(
 }
 
 void Implementation::inject_output_handler_(
-    const std::shared_ptr<serial::srv::InjectOutput::Request> request,
-    std::shared_ptr<serial::srv::InjectOutput::Response> response) {
+    const std::shared_ptr<srv::InjectOutput::Request> request,
+    std::shared_ptr<srv::InjectOutput::Response> response) {
   (void)response;
 
   RCLCPP_INFO(this->get_logger_(), "Incoming request to inject output data: %s",
@@ -121,4 +121,4 @@ const rclcpp::Logger Implementation::get_logger_() {
   return rclcpp::get_logger(get_prefix_());
 }
 
-}  // namespace serial
+}  // namespace ros2_serial

@@ -7,11 +7,11 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "serial/interface_remote.hpp"
+#include "ros2_serial/interface_remote.hpp"
 
 #include <functional>
 
-namespace serial {
+namespace ros2_serial {
 
 RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   callback_group_ =
@@ -20,7 +20,7 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
 
   RCLCPP_DEBUG(node_->get_logger(),
-               "serial::RemoteInterface::RemoteInterface(): Connecting to the "
+               "ros2_serial::RemoteInterface::RemoteInterface(): Connecting to the "
                "remote interface: %s",
                prefix.c_str());
 
@@ -28,10 +28,10 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
       prefix + SERIAL_TOPIC_INPUT, 10,
       std::bind(&RemoteInterface::input_handler, this, std::placeholders::_1));
 
-  clnt_inject_input = node->create_client<serial::srv::InjectInput>(
+  clnt_inject_input = node->create_client<srv::InjectInput>(
       prefix + SERIAL_SERVICE_INJECT_INPUT, ::rmw_qos_profile_default,
       callback_group_);
-  clnt_inject_output = node->create_client<serial::srv::InjectOutput>(
+  clnt_inject_output = node->create_client<srv::InjectOutput>(
       prefix + SERIAL_SERVICE_INJECT_OUTPUT, ::rmw_qos_profile_default,
       callback_group_);
 
@@ -43,14 +43,14 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
 }
 
 void RemoteInterface::output(const std::string &data) {
-  auto request = std::make_shared<serial::srv::InjectOutput::Request>();
+  auto request = std::make_shared<srv::InjectOutput::Request>();
   request->data = data;
   auto f = clnt_inject_output->async_send_request(request);
   f.wait();
 }
 
 void RemoteInterface::inject_input(const std::string &data) {
-  auto request = std::make_shared<serial::srv::InjectInput::Request>();
+  auto request = std::make_shared<srv::InjectInput::Request>();
   request->data = data;
   auto f = clnt_inject_input->async_send_request(request);
   f.wait();
@@ -74,4 +74,4 @@ void RemoteInterface::input_handler(
   input_mutex_.unlock();
 }
 
-}  // namespace serial
+}  // namespace ros2_serial

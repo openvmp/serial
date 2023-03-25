@@ -20,7 +20,7 @@
 #define SERIAL_SERVICE_INJECT_INPUT "/inject/input"
 #define SERIAL_SERVICE_INJECT_OUTPUT "/inject/output"
 
-namespace serial {
+namespace ros2_serial {
 
 class Interface {
  public:
@@ -46,6 +46,6 @@ class Interface {
   rclcpp::Parameter interface_prefix_;
 };
 
-}  // namespace serial
+}  // namespace ros2_serial
 
 #endif  // OPENVMP_SERIAL_INTERFACE_H

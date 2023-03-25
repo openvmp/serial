@@ -8,11 +8,11 @@
  */
 
 #include "rclcpp/rclcpp.hpp"
-#include "serial/node.hpp"
+#include "ros2_serial/node.hpp"
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<serial::Node>();
+  auto node = std::make_shared<ros2_serial::Node>();
 
   rclcpp::executors::MultiThreadedExecutor exec;
   exec.add_node(node);

@@ -14,7 +14,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-namespace serial {
+namespace ros2_serial {
 
 class PortSettings {
  public:
@@ -33,6 +33,6 @@ class PortSettings {
   int setup(int old_fd);
 };
 
-}  // namespace serial
+}  // namespace ros2_serial
 
 #endif  // OPENVMP_SERIAL_PORT_H

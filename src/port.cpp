@@ -8,7 +8,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#include "serial/port.hpp"
+#include "ros2_serial/port.hpp"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -18,7 +18,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace serial {
+namespace ros2_serial {
 
 int PortSettings::setup(int old_fd) {
   if (old_fd != -1) {
@@ -195,4 +195,4 @@ int PortSettings::setup(int old_fd) {
   return fd;
 }
 
-}  // namespace serial
+}  // namespace ros2_serial

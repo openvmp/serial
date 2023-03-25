@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string>
 
-namespace serial {
+namespace ros2_serial {
 
 namespace utils {
 
@@ -31,6 +31,6 @@ static inline std::string bin2hex(const std::string &bin) {
 
 }  // namespace utils
 
-}  // namespace serial
+}  // namespace ros2_serial
 
 #endif  // OPENVMP_SERIAL_UTILS_H

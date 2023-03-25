@@ -16,12 +16,12 @@
 
 #include "rclcpp/callback_group.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "serial/interface.hpp"
-#include "serial/srv/inject_input.hpp"
-#include "serial/srv/inject_output.hpp"
+#include "ros2_serial/interface.hpp"
+#include "ros2_serial/srv/inject_input.hpp"
+#include "ros2_serial/srv/inject_output.hpp"
 #include "std_msgs/msg/string.hpp"
 
-namespace serial {
+namespace ros2_serial {
 
 class RemoteInterface final : public Interface {
  public:
@@ -49,10 +49,10 @@ class RemoteInterface final : public Interface {
 
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_input;
 
-  rclcpp::Client<serial::srv::InjectInput>::SharedPtr clnt_inject_input;
-  rclcpp::Client<serial::srv::InjectOutput>::SharedPtr clnt_inject_output;
+  rclcpp::Client<srv::InjectInput>::SharedPtr clnt_inject_input;
+  rclcpp::Client<srv::InjectOutput>::SharedPtr clnt_inject_output;
 };
 
-}  // namespace serial
+}  // namespace ros2_serial
 
 #endif  // OPENVMP_SERIAL_INTERFACE_REMOTE_H

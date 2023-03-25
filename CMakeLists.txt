@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(serial)
+project(ros2_serial)
 
 # Compiler settings
 if(NOT CMAKE_CXX_STANDARD)

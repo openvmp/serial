@@ -7,10 +7,10 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "serial/worker.hpp"
+#include "ros2_serial/worker.hpp"
 
-#include "serial/interface.hpp"
-#include "serial/utils.hpp"
+#include "ros2_serial/interface.hpp"
+#include "ros2_serial/utils.hpp"
 
 #define _BSD_SOURCE
 #include <fcntl.h>
@@ -22,7 +22,7 @@
 #define RCLCPP_DEBUG(...)
 #endif
 
-namespace serial {
+namespace ros2_serial {
 
 Worker::Worker(Implementation *impl, std::shared_ptr<PortSettings> settings)
     : impl_(impl),
@@ -246,4 +246,4 @@ const rclcpp::Logger Worker::get_logger_() {
   return rclcpp::get_logger("serial(" + settings_->dev_name.as_string() + ")");
 }
 
-}  // namespace serial
+}  // namespace ros2_serial
