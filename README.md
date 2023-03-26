@@ -22,13 +22,13 @@ ensuring maximum performance.
 Launch it as a separate node for each serial port:
 
 ```
-$ ros2 run serial serial_standalone
+$ ros2 run ros2_serial ros2_serial_standalone
 ```
 
 or
 
 ```
-$ ros2 run serial serial_standalone \
+$ ros2 run ros2_serial ros2_serial_standalone \
   --ros-args \
   --remap serial:__node:=serial_com1 \
   -p serial_prefix:=/serial/com1 \
@@ -44,7 +44,7 @@ $ ros2 run serial serial_standalone \
 flowchart TB
     cli["$ ros2 topic echo /serial/com1"] -. "DDS" .-> topic_serial[/ROS2 interfaces:\n/serial/com1/.../]
     app["Your process"] -- "DDS\n(with context switch)" --> topic_serial
-    subgraph serial["Process: serial_standalone"]
+    subgraph serial["Process: ros2_serial_standalone"]
       topic_serial --> driver["Serial port driver"]
     end
     driver --> file{{"Character device: /dev/ttyS0"}}
@@ -63,7 +63,7 @@ See an example of such a setup in the Modbus RTU package:
 flowchart TB
     cli_serial["# Serial debugging\n$ ros2 topic echo /serial"] -. "DDS" ..-> topic_serial[/ROS2 interfaces:\n/serial/.../]
     subgraph modbus_exe["Your process"]
-      subgraph serial["Library: serial"]
+      subgraph serial["Library: ros2_serial"]
         topic_serial --> driver["Serial port driver"]
       end
       code["Your code"] -- "DDS\n(potentially without\ncontext switch)" --> topic_serial
@@ -80,9 +80,9 @@ flowchart TB
     owner["Native API"]
     external["ROS2 Interface API"]
 
-    subgraph node["serial::Node"]
+    subgraph node["ros2_serial::Node"]
 
-      subgraph interface_ros2["serial::InterfaceRemote"]
+      subgraph interface_ros2["ros2_serial::InterfaceRemote"]
         subgraph topics["Topics: /serial"]
           published_input[//inspect/input/]
           published_output[//inspect/output/]
@@ -94,11 +94,11 @@ flowchart TB
         end
       end
 
-      subgraph worker["serial::Worker"]
+      subgraph worker["ros2_serial::Worker"]
         output_queue["Output Queue"]
         thread["Worker thread\nrunning select()"]
 
-        subgraph interface_native["serial::Implementation"]
+        subgraph interface_native["ros2_serial::Implementation"]
           subgraph register_input_cb["register_input_cb()"]
             input_cb["input_cb()"]
           end
@@ -133,4 +133,3 @@ flowchart TB
     thread -- "output" --> fd -- "output" --> file
 
 ```
-
