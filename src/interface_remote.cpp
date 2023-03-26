@@ -20,7 +20,7 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
 
   RCLCPP_DEBUG(node_->get_logger(),
-               "ros2_serial::RemoteInterface::RemoteInterface(): Connecting to the "
+               "serial::RemoteInterface::RemoteInterface(): Connecting to the "
                "remote interface: %s",
                prefix.c_str());
 
