@@ -18,7 +18,53 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "ros2_serial/worker.hpp"
+
 namespace ros2_serial {
+
+Port::Port(rclcpp::Node *node)
+    : Implementation(node), port_settings_(new PortSettings()) {
+  node_->declare_parameter("serial_dev_name", "/dev/ttyS0");
+  node_->declare_parameter("serial_skip_init", false);
+  node_->declare_parameter("serial_baud_rate", 115200);
+  node_->declare_parameter("serial_data", 8);
+  node_->declare_parameter("serial_parity", false);
+  node_->declare_parameter("serial_stop", 1);
+  node_->declare_parameter("serial_flow_control", false);
+  node_->declare_parameter("serial_sw_flow_control", false);
+  node_->declare_parameter("serial_bs", 1024);
+  node_->get_parameter("serial_dev_name", port_settings_->dev_name);
+  node_->get_parameter("serial_skip_init", port_settings_->skip_init);
+  node_->get_parameter("serial_baud_rate", port_settings_->baud_rate);
+  node_->get_parameter("serial_data", port_settings_->data);
+  node_->get_parameter("serial_stop", port_settings_->stop);
+  node_->get_parameter("serial_parity", port_settings_->parity);
+  node_->get_parameter("serial_flow_control", port_settings_->flow_control);
+  node_->get_parameter("serial_sw_flow_control",
+                       port_settings_->sw_flow_control);
+  node_->get_parameter("serial_bs", port_settings_->bs);
+
+  RCLCPP_INFO(node_->get_logger(), "Serial node initialization complete for %s",
+              port_settings_->dev_name.as_string().c_str());
+
+  // Topics are initialized prior to the worker.
+  // That is done to put the burden of null checks on the DDS side.
+  // Should the burden be on the device driver side,
+  // then the conditions for the serial line saturation will be met more often.
+  worker_ = std::make_shared<Worker>(this, port_settings_);
+}
+
+void Port::output(const std::string &msg) { worker_->output(msg); }
+
+// having pure pointers would improve performance here
+// but it would be against the religion of so many
+void Port::register_input_cb(void (*input_cb)(const std::string &msg,
+                                              void *user_data),
+                             void *user_data) {
+  worker_->register_input_cb(input_cb, user_data);
+}
+
+void Port::inject_input(const std::string &msg) { worker_->inject_input(msg); }
 
 int PortSettings::setup(int old_fd) {
   if (old_fd != -1) {

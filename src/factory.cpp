@@ -11,8 +11,8 @@
 
 #include <exception>
 
-#include "ros2_serial/implementation.hpp"
 #include "ros2_serial/interface_remote.hpp"
+#include "ros2_serial/port.hpp"
 
 namespace ros2_serial {
 
@@ -24,7 +24,7 @@ std::shared_ptr<Interface> Factory::New(rclcpp::Node *node) {
   if (is_remote.as_bool()) {
     return std::make_shared<RemoteInterface>(node);
   } else {
-    return std::make_shared<Implementation>(node);
+    return std::make_shared<Port>(node);
   }
 }
 

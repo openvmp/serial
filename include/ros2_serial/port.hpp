@@ -10,9 +10,11 @@
 #ifndef OPENVMP_SERIAL_PORT_H
 #define OPENVMP_SERIAL_PORT_H
 
+#include <memory>
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
+#include "ros2_serial/implementation.hpp"
 
 namespace ros2_serial {
 
@@ -31,6 +33,32 @@ class PortSettings {
   rclcpp::Parameter bs;
 
   int setup(int old_fd);
+};
+
+class Worker;
+
+class Port final : public Implementation {
+  friend Worker;  // Let the Worker class access 'node_'
+
+ public:
+  Port(rclcpp::Node *node);
+
+  virtual void output(const std::string &msg) override;
+
+  // having pure pointers would improve performance here
+  // but it would be against the religion of so many
+  virtual void register_input_cb(void (*input_cb)(const std::string &msg,
+                                                  void *user_data),
+                                 void *user_data) override;
+
+  virtual void inject_input(const std::string &msg) override;
+
+ private:
+  // node parameters
+  std::shared_ptr<PortSettings> port_settings_;
+
+  // port worker
+  std::shared_ptr<Worker> worker_;
 };
 
 }  // namespace ros2_serial

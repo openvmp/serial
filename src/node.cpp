@@ -12,7 +12,7 @@
 namespace ros2_serial {
 
 Node::Node() : rclcpp::Node::Node("serial") {
-  impl_ = std::make_shared<Implementation>(this);
+  impl_ = std::make_shared<Port>(this);
 }
 
 }  // namespace ros2_serial

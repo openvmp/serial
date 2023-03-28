@@ -24,7 +24,7 @@
 
 namespace ros2_serial {
 
-Worker::Worker(Implementation *impl, std::shared_ptr<PortSettings> settings)
+Worker::Worker(Port *impl, std::shared_ptr<PortSettings> settings)
     : impl_(impl),
       settings_(settings),
       fd_(-1),

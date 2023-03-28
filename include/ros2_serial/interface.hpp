@@ -24,7 +24,7 @@ namespace ros2_serial {
 
 class Interface {
  public:
-  Interface(rclcpp::Node *node);
+  Interface(rclcpp::Node *node, const std::string &default_prefix = "");
   virtual ~Interface() {}
 
   virtual void output(const std::string &) = 0;

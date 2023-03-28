@@ -14,7 +14,7 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/implementation.hpp"
+#include "ros2_serial/port.hpp"
 
 namespace ros2_serial {
 
@@ -23,7 +23,7 @@ class Node : public rclcpp::Node {
   Node();
 
  private:
-  std::shared_ptr<Implementation> impl_;
+  std::shared_ptr<Port> impl_;
 };
 
 }  // namespace ros2_serial

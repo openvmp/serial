@@ -15,7 +15,6 @@
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/implementation.hpp"
 #include "ros2_serial/interface.hpp"
 #include "ros2_serial/port.hpp"
 
@@ -23,7 +22,7 @@ namespace ros2_serial {
 
 class Worker final {
  public:
-  Worker(Implementation *impl, std::shared_ptr<PortSettings> settings);
+  Worker(Port *impl, std::shared_ptr<PortSettings> settings);
   virtual ~Worker();
 
   void stop();
@@ -38,7 +37,7 @@ class Worker final {
 
  private:
   // port
-  Implementation *impl_;
+  Port *impl_;
   std::shared_ptr<PortSettings> settings_;
   int fd_;
 

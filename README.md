@@ -94,7 +94,7 @@ flowchart TB
         end
       end
 
-      subgraph worker["ros2_serial::Worker"]
+      subgraph worker["ros2_serial::Port"]
         output_queue["Output Queue"]
         thread["Worker thread\nrunning select()"]
 
