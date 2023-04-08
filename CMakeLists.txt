@@ -3,7 +3,7 @@ project(ros2_serial)
 
 # Compiler settings
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -21,8 +21,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/InjectInput.srv"
   "srv/InjectOutput.srv"
 )
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 include_directories(
   include
@@ -45,7 +43,6 @@ set(project_DEPENDENCIES
 
 # Executable target
 add_executable(${PROJECT_NAME}_standalone src/main.cpp ${project_SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME}_standalone ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
 ament_target_dependencies(${PROJECT_NAME}_standalone ${project_DEPENDENCIES})
 install(TARGETS
   ${PROJECT_NAME}_standalone
@@ -54,7 +51,6 @@ install(TARGETS
 
 # Library target
 add_library(${PROJECT_NAME}_native ${project_SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME}_native ${rclcpp_LIBRARIES} "${cpp_typesupport_target}")
 ament_target_dependencies(${PROJECT_NAME}_native ${project_DEPENDENCIES})
 ament_export_targets(${PROJECT_NAME}_native_library HAS_LIBRARY_TARGET)
 ament_export_dependencies(rclcpp)
@@ -68,6 +64,18 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
+
+if($ENV{ROS_DISTRO} STREQUAL "foxy")
+rosidl_target_interfaces(${PROJECT_NAME}_standalone
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(${PROJECT_NAME}_native
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+else()
+rosidl_get_typesupport_target(cpp_typesupport_target
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_link_libraries(${PROJECT_NAME}_standalone ${project_LIBRARIES} "${cpp_typesupport_target}")
+target_link_libraries(${PROJECT_NAME}_native ${project_LIBRARIES} "${cpp_typesupport_target}")
+endif()
 
 # Testing
 if(BUILD_TESTING)

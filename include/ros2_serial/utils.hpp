@@ -10,6 +10,7 @@
 #ifndef OPENVMP_SERIAL_UTILS_H
 #define OPENVMP_SERIAL_UTILS_H
 
+#include <iomanip>
 #include <sstream>
 #include <string>
 
