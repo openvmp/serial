@@ -60,7 +60,7 @@ class Worker final {
   std::mutex input_cb_mutex_;
 
   // misc
-  const rclcpp::Logger get_logger_();
+  const rclcpp::Logger logger_;
 };
 
 }  // namespace ros2_serial

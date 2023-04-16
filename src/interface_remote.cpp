@@ -13,7 +13,8 @@
 
 namespace ros2_serial {
 
-RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
+RemoteInterface::RemoteInterface(rclcpp::Node *node)
+    : Interface(node), input_cb_{nullptr}, input_cb_user_data_{nullptr} {
   callback_group_ =
       node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 

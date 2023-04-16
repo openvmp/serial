@@ -42,8 +42,6 @@ class Implementation : public Interface {
   void inject_output_handler_(
       const std::shared_ptr<srv::InjectOutput::Request> request,
       std::shared_ptr<srv::InjectOutput::Response> response);
-
-  const rclcpp::Logger get_logger_();
 };
 
 }  // namespace ros2_serial
