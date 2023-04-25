@@ -17,8 +17,9 @@
 
 #define SERIAL_TOPIC_INPUT "/inspect/input"
 #define SERIAL_TOPIC_OUTPUT "/inspect/output"
-#define SERIAL_SERVICE_INJECT_INPUT "/inject/input"
-#define SERIAL_SERVICE_INJECT_OUTPUT "/inject/output"
+#define SERIAL_TOPIC_INJECT_INPUT "/inject/input"
+#define SERIAL_TOPIC_INJECT_OUTPUT "/inject/output"
+#define SERIAL_SERVICE_FLUSH "/flush"
 
 namespace ros2_serial {
 

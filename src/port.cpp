@@ -52,6 +52,8 @@ Port::Port(rclcpp::Node *node)
   // Should the burden be on the device driver side,
   // then the conditions for the serial line saturation will be met more often.
   worker_ = std::make_shared<Worker>(this, port_settings_);
+
+  init_serial_();
 }
 
 void Port::output(const std::string &msg) { worker_->output(msg); }

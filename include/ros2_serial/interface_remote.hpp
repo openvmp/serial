@@ -17,9 +17,9 @@
 #include "rclcpp/callback_group.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "ros2_serial/interface.hpp"
-#include "ros2_serial/srv/inject_input.hpp"
-#include "ros2_serial/srv/inject_output.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/empty.hpp"
+#include "std_msgs/msg/u_int8_multi_array.hpp"
+#include "std_srvs/srv/empty.hpp"
 
 namespace ros2_serial {
 
@@ -38,8 +38,7 @@ class RemoteInterface final : public Interface {
                                  void *user_data) override;
 
  protected:
-  void input_handler(const std_msgs::msg::String::SharedPtr);
-  // void output_handler(const std_msgs::msg::String &data);
+  void input_handler(const std_msgs::msg::UInt8MultiArray::SharedPtr);
 
  private:
   std::mutex input_mutex_;
@@ -47,10 +46,13 @@ class RemoteInterface final : public Interface {
   void *input_cb_user_data_;
   rclcpp::CallbackGroup::SharedPtr callback_group_;
 
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_input;
+  rclcpp::Subscription<std_msgs::msg::UInt8MultiArray>::SharedPtr sub_input_;
 
-  rclcpp::Client<srv::InjectInput>::SharedPtr clnt_inject_input;
-  rclcpp::Client<srv::InjectOutput>::SharedPtr clnt_inject_output;
+  rclcpp::Publisher<std_msgs::msg::UInt8MultiArray>::SharedPtr
+      pub_inject_input_;
+  rclcpp::Publisher<std_msgs::msg::UInt8MultiArray>::SharedPtr
+      pub_inject_output_;
+  rclcpp::Client<std_srvs::srv::Empty>::SharedPtr clnt_flush_;
 };
 
 }  // namespace ros2_serial

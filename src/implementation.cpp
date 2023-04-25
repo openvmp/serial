@@ -17,48 +17,61 @@ namespace ros2_serial {
 Implementation::Implementation(rclcpp::Node *node,
                                const std::string &default_prefix)
     : Interface(node, default_prefix) {
-  auto prefix = get_prefix_();
+  callback_group_ =
+      node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+}
 
-  inspect_input = node->create_publisher<std_msgs::msg::String>(
+void Implementation::init_serial_() {
+  auto prefix = get_prefix_();
+  inspect_input = node_->create_publisher<std_msgs::msg::UInt8MultiArray>(
       prefix + SERIAL_TOPIC_INPUT, 10);
-  inspect_output = node->create_publisher<std_msgs::msg::String>(
+  inspect_output = node_->create_publisher<std_msgs::msg::UInt8MultiArray>(
       prefix + SERIAL_TOPIC_OUTPUT, 10);
 
-  inject_input_ = node->create_service<srv::InjectInput>(
-      prefix + SERIAL_SERVICE_INJECT_INPUT,
-      std::bind(&Implementation::inject_input_handler_, this,
-                std::placeholders::_1, std::placeholders::_2));
-  inject_output_ = node->create_service<srv::InjectOutput>(
-      prefix + SERIAL_SERVICE_INJECT_OUTPUT,
-      std::bind(&Implementation::inject_output_handler_, this,
-                std::placeholders::_1, std::placeholders::_2));
+  sub_inject_input_ =
+      node_->create_subscription<std_msgs::msg::UInt8MultiArray>(
+          prefix + SERIAL_TOPIC_INJECT_INPUT, 10,
+          std::bind(&Implementation::inject_input_handler_, this,
+                    std::placeholders::_1));
+  sub_inject_output_ =
+      node_->create_subscription<std_msgs::msg::UInt8MultiArray>(
+          prefix + SERIAL_TOPIC_INJECT_OUTPUT, 10,
+          std::bind(&Implementation::inject_output_handler_, this,
+                    std::placeholders::_1));
+
+  srv_flush_ = node_->create_service<std_srvs::srv::Empty>(
+      prefix + SERIAL_SERVICE_FLUSH,
+      std::bind(&Implementation::flush_handler_, this, std::placeholders::_1,
+                std::placeholders::_2),
+      ::rmw_qos_profile_default, callback_group_);
 }
 
 void Implementation::inject_input_handler_(
-    const std::shared_ptr<srv::InjectInput::Request> request,
-    std::shared_ptr<srv::InjectInput::Response> response) {
-  (void)response;
-
+    const std_msgs::msg::UInt8MultiArray::SharedPtr msg) {
+  auto str = std::string(msg->data.begin(), msg->data.end());
   RCLCPP_DEBUG(node_->get_logger(), "Incoming request to inject input data: %s",
-               utils::bin2hex(request->data).c_str());
+               utils::bin2hex(str).c_str());
+  inject_input(str);
 
-  inject_input(request->data);
-
-  auto message = std_msgs::msg::String();
-  message.data = request->data;
+  auto message = std_msgs::msg::UInt8MultiArray();
+  message.data = msg->data;
   inspect_input->publish(message);
 }
 
 void Implementation::inject_output_handler_(
-    const std::shared_ptr<srv::InjectOutput::Request> request,
-    std::shared_ptr<srv::InjectOutput::Response> response) {
-  (void)response;
-
+    const std_msgs::msg::UInt8MultiArray::SharedPtr msg) {
+  auto str = std::string(msg->data.begin(), msg->data.end());
   RCLCPP_DEBUG(node_->get_logger(),
                "Incoming request to inject output data: %s",
-               utils::bin2hex(request->data).c_str());
+               utils::bin2hex(str).c_str());
+  output(str);
+}
 
-  output(request->data);
+void Implementation::flush_handler_(
+    const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+    std::shared_ptr<std_srvs::srv::Empty::Response> response) {
+  (void)request;
+  (void)response;
 }
 
 }  // namespace ros2_serial

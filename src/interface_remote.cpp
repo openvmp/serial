@@ -25,36 +25,34 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node)
                "remote interface: %s",
                prefix.c_str());
 
-  sub_input = node->create_subscription<std_msgs::msg::String>(
+  sub_input_ = node->create_subscription<std_msgs::msg::UInt8MultiArray>(
       prefix + SERIAL_TOPIC_INPUT, 10,
       std::bind(&RemoteInterface::input_handler, this, std::placeholders::_1));
 
-  clnt_inject_input = node->create_client<srv::InjectInput>(
-      prefix + SERIAL_SERVICE_INJECT_INPUT, ::rmw_qos_profile_default,
-      callback_group_);
-  clnt_inject_output = node->create_client<srv::InjectOutput>(
-      prefix + SERIAL_SERVICE_INJECT_OUTPUT, ::rmw_qos_profile_default,
+  pub_inject_input_ = node->create_publisher<std_msgs::msg::UInt8MultiArray>(
+      prefix + SERIAL_TOPIC_INJECT_INPUT, 10);
+  pub_inject_output_ = node->create_publisher<std_msgs::msg::UInt8MultiArray>(
+      prefix + SERIAL_TOPIC_INJECT_OUTPUT, 10);
+  clnt_flush_ = node->create_client<std_srvs::srv::Empty>(
+      prefix + SERIAL_SERVICE_FLUSH, ::rmw_qos_profile_default,
       callback_group_);
 
-  clnt_inject_input->wait_for_service();
-  clnt_inject_output->wait_for_service();
+  clnt_flush_->wait_for_service();
 
   RCLCPP_DEBUG(node_->get_logger(), "Connected to the remote interface: %s",
                prefix.c_str());
 }
 
 void RemoteInterface::output(const std::string &data) {
-  auto request = std::make_shared<srv::InjectOutput::Request>();
-  request->data = data;
-  auto f = clnt_inject_output->async_send_request(request);
-  f.wait();
+  auto msg = std_msgs::msg::UInt8MultiArray();
+  msg.data = std::vector<uint8_t>(data.begin(), data.end());
+  pub_inject_output_->publish(msg);
 }
 
 void RemoteInterface::inject_input(const std::string &data) {
-  auto request = std::make_shared<srv::InjectInput::Request>();
-  request->data = data;
-  auto f = clnt_inject_input->async_send_request(request);
-  f.wait();
+  auto msg = std_msgs::msg::UInt8MultiArray();
+  msg.data = std::vector<uint8_t>(data.begin(), data.end());
+  pub_inject_input_->publish(msg);
 }
 
 // having pure pointers would improve performance here
@@ -69,9 +67,10 @@ void RemoteInterface::register_input_cb(void (*input_cb)(const std::string &msg,
 }
 
 void RemoteInterface::input_handler(
-    const std_msgs::msg::String::SharedPtr data) {
+    const std_msgs::msg::UInt8MultiArray::SharedPtr request) {
   input_mutex_.lock();
-  if (input_cb_) input_cb_(data->data, input_cb_user_data_);
+  auto str = std::string(request->data.begin(), request->data.end());
+  if (input_cb_) input_cb_(str, input_cb_user_data_);
   input_mutex_.unlock();
 }
 

@@ -14,14 +14,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-# Logic shared by all targets
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/InjectInput.srv"
-  "srv/InjectOutput.srv"
-)
-
+# Shared by all targets
 include_directories(
   include
 )
@@ -39,6 +35,7 @@ set(project_SOURCE_FILES
 set(project_DEPENDENCIES
   rclcpp
   std_msgs
+  std_srvs
 )
 
 # Executable target
@@ -53,7 +50,7 @@ install(TARGETS
 add_library(${PROJECT_NAME}_native ${project_SOURCE_FILES})
 ament_target_dependencies(${PROJECT_NAME}_native ${project_DEPENDENCIES})
 ament_export_targets(${PROJECT_NAME}_native_library HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp)
+ament_export_dependencies(${project_DEPENDENCIES})
 ament_export_include_directories(include)
 install(TARGETS ${PROJECT_NAME}_native
   EXPORT ${PROJECT_NAME}_native_library
@@ -64,18 +61,6 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-
-if($ENV{ROS_DISTRO} STREQUAL "foxy")
-rosidl_target_interfaces(${PROJECT_NAME}_standalone
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
-rosidl_target_interfaces(${PROJECT_NAME}_native
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
-else()
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
-target_link_libraries(${PROJECT_NAME}_standalone ${project_LIBRARIES} "${cpp_typesupport_target}")
-target_link_libraries(${PROJECT_NAME}_native ${project_LIBRARIES} "${cpp_typesupport_target}")
-endif()
 
 # Testing
 if(BUILD_TESTING)

@@ -19,7 +19,12 @@
 
 #ifndef DEBUG
 #undef RCLCPP_DEBUG
+#if 1
 #define RCLCPP_DEBUG(...)
+#else
+#define RCLCPP_DEBUG RCLCPP_INFO
+#define DEBUG
+#endif
 #endif
 
 namespace ros2_serial {
@@ -178,10 +183,12 @@ void Worker::run_() {
         }
 
         // Now publish what is written successfully
-        auto message = std_msgs::msg::String();
-        message.data = std::string(read_pos, wrote);
+        auto message = std_msgs::msg::UInt8MultiArray();
+        // TODO(clairbee): optimize extra copy away
+        auto str = std::string(read_pos, wrote);
+        message.data = std::vector<uint8_t>(str.begin(), str.end());
         RCLCPP_DEBUG(logger_, "Publishing written data: '%s'",
-                     utils::bin2hex(message.data).c_str());
+                     utils::bin2hex(str).c_str());
         impl_->inspect_output->publish(message);
 
         // Advance the queue read position
@@ -221,8 +228,10 @@ void Worker::run_() {
       }
 
       if (total > 0) {
-        auto message = std_msgs::msg::String();
-        message.data = std::string(buffer.get(), total);
+        auto message = std_msgs::msg::UInt8MultiArray();
+        // TODO(clairbee): optimize extra copy away
+        auto str = std::string(buffer.get(), total);
+        message.data = std::vector<uint8_t>(str.begin(), str.end());
 
         RCLCPP_DEBUG(logger_, "received input of %d bytes", total);
 
@@ -231,13 +240,13 @@ void Worker::run_() {
           // having pure pointers would improve performance here
           // by skipping data copying few lines above (message.data)
 
-          input_cb_(message.data, input_cb_user_data_);
+          input_cb_(str, input_cb_user_data_);
         }
         input_cb_mutex_.unlock();
         RCLCPP_DEBUG(logger_, "received input of %d bytes: done", total);
 
         RCLCPP_DEBUG(logger_, "Publishing received: '%s'",
-                     utils::bin2hex(message.data).c_str());
+                     utils::bin2hex(str).c_str());
         impl_->inspect_input->publish(message);
       }
     }
