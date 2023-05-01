@@ -14,12 +14,12 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/interface.hpp"
+#include "remote_serial/interface.hpp"
 #include "std_msgs/msg/empty.hpp"
 #include "std_msgs/msg/u_int8_multi_array.hpp"
 #include "std_srvs/srv/empty.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class Implementation : public Interface {
  public:
@@ -55,6 +55,6 @@ class Implementation : public Interface {
   void inject_output_handler_(const std_msgs::msg::UInt8MultiArray::SharedPtr);
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_IMPLEMENTATION_H

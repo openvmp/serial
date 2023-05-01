@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node as rclpyNode
 
-from ros2_serial.srv import InjectOutput
+from remote_serial.srv import InjectOutput
 import std_msgs.msg
 
 

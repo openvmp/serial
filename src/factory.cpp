@@ -7,14 +7,14 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_serial/factory.hpp"
+#include "remote_serial/factory.hpp"
 
 #include <exception>
 
-#include "ros2_serial/interface_remote.hpp"
-#include "ros2_serial/port.hpp"
+#include "remote_serial/interface_remote.hpp"
+#include "remote_serial/port.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 std::shared_ptr<Interface> Factory::New(rclcpp::Node *node) {
   rclcpp::Parameter is_remote;
@@ -28,4 +28,4 @@ std::shared_ptr<Interface> Factory::New(rclcpp::Node *node) {
   }
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

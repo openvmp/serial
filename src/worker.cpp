@@ -7,10 +7,10 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_serial/worker.hpp"
+#include "remote_serial/worker.hpp"
 
-#include "ros2_serial/interface.hpp"
-#include "ros2_serial/utils.hpp"
+#include "remote_serial/interface.hpp"
+#include "remote_serial/utils.hpp"
 
 #define _BSD_SOURCE
 #include <fcntl.h>
@@ -27,7 +27,7 @@
 #endif
 #endif
 
-namespace ros2_serial {
+namespace remote_serial {
 
 Worker::Worker(Port *impl, std::shared_ptr<PortSettings> settings)
     : impl_(impl),
@@ -253,4 +253,4 @@ void Worker::run_() {
   }
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

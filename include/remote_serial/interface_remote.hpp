@@ -16,12 +16,12 @@
 
 #include "rclcpp/callback_group.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/interface.hpp"
+#include "remote_serial/interface.hpp"
 #include "std_msgs/msg/empty.hpp"
 #include "std_msgs/msg/u_int8_multi_array.hpp"
 #include "std_srvs/srv/empty.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class RemoteInterface final : public Interface {
  public:
@@ -55,6 +55,6 @@ class RemoteInterface final : public Interface {
   rclcpp::Client<std_srvs::srv::Empty>::SharedPtr clnt_flush_;
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_INTERFACE_REMOTE_H

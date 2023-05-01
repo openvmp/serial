@@ -7,11 +7,11 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_serial/interface_remote.hpp"
+#include "remote_serial/interface_remote.hpp"
 
 #include <functional>
 
-namespace ros2_serial {
+namespace remote_serial {
 
 RemoteInterface::RemoteInterface(rclcpp::Node *node)
     : Interface(node), input_cb_{nullptr}, input_cb_user_data_{nullptr} {
@@ -74,4 +74,4 @@ void RemoteInterface::input_handler(
   input_mutex_.unlock();
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

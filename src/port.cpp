@@ -8,7 +8,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#include "ros2_serial/port.hpp"
+#include "remote_serial/port.hpp"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -18,9 +18,9 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "ros2_serial/worker.hpp"
+#include "remote_serial/worker.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 Port::Port(rclcpp::Node *node)
     : Implementation(node), port_settings_(new PortSettings()) {
@@ -243,4 +243,4 @@ int PortSettings::setup(int old_fd) {
   return fd;
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

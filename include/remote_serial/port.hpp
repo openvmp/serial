@@ -14,9 +14,9 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/implementation.hpp"
+#include "remote_serial/implementation.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class PortSettings {
  public:
@@ -61,6 +61,6 @@ class Port final : public Implementation {
   std::shared_ptr<Worker> worker_;
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_PORT_H

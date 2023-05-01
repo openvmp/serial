@@ -15,10 +15,10 @@
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/interface.hpp"
-#include "ros2_serial/port.hpp"
+#include "remote_serial/interface.hpp"
+#include "remote_serial/port.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class Worker final {
  public:
@@ -63,6 +63,6 @@ class Worker final {
   const rclcpp::Logger logger_;
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_WORKER_H

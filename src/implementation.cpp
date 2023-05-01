@@ -7,12 +7,12 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_serial/implementation.hpp"
+#include "remote_serial/implementation.hpp"
 
-#include "ros2_serial/utils.hpp"
-#include "ros2_serial/worker.hpp"
+#include "remote_serial/utils.hpp"
+#include "remote_serial/worker.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 Implementation::Implementation(rclcpp::Node *node,
                                const std::string &default_prefix)
@@ -74,4 +74,4 @@ void Implementation::flush_handler_(
   (void)response;
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

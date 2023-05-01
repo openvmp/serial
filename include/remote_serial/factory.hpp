@@ -13,15 +13,15 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/interface.hpp"
+#include "remote_serial/interface.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class Factory {
  public:
   static std::shared_ptr<Interface> New(rclcpp::Node *node);
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_FACTORY_H

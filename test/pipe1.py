@@ -31,7 +31,6 @@ TTY2 = "/tmp/ttyS22"
 @pytest.mark.launch_test
 @launch_testing.markers.keep_alive
 def generate_test_description():
-
     socat = ExecuteProcess(
         name="socat",
         cmd=[
@@ -48,11 +47,12 @@ def generate_test_description():
     )
     node1 = Node(
         name="serial_com1",
-        package="ros2_serial",
-        executable="ros2_serial_standalone",
+        package="remote_serial",
+        executable="remote_serial_standalone",
         # arguments=["--ros-args", "--log-level", "debug"],
         parameters=[
             {
+                "serial_is_remote": False,
                 "serial_prefix": "/serial/com1",
                 "serial_dev_name": TTY1,
                 # "serial_skip_init": True,
@@ -67,11 +67,12 @@ def generate_test_description():
     )
     node2 = Node(
         name="serial_com2",
-        package="ros2_serial",
-        executable="ros2_serial_standalone",
+        package="remote_serial",
+        executable="remote_serial_standalone",
         # arguments=["--ros-args", "--log-level", "debug"],
         parameters=[
             {
+                "serial_is_remote": False,
                 "serial_prefix": "/serial/com2",
                 "serial_dev_name": TTY2,
                 # "serial_skip_init": True,

@@ -14,9 +14,9 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_serial/port.hpp"
+#include "remote_serial/port.hpp"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class Node : public rclcpp::Node {
  public:
@@ -26,6 +26,6 @@ class Node : public rclcpp::Node {
   std::shared_ptr<Port> impl_;
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_NODE_H

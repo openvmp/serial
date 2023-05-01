@@ -7,11 +7,11 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_serial/interface.hpp"
+#include "remote_serial/interface.hpp"
 
 #include <functional>
 
-namespace ros2_serial {
+namespace remote_serial {
 
 Interface::Interface(rclcpp::Node *node, const std::string &default_prefix)
     : node_{node} {
@@ -42,4 +42,4 @@ std::string Interface::get_prefix_() {
   return prefix;
 }
 
-}  // namespace ros2_serial
+}  // namespace remote_serial

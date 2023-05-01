@@ -21,17 +21,18 @@
 #define SERIAL_TOPIC_INJECT_OUTPUT "/inject/output"
 #define SERIAL_SERVICE_FLUSH "/flush"
 
-namespace ros2_serial {
+namespace remote_serial {
 
 class Interface {
  public:
   Interface(rclcpp::Node *node, const std::string &default_prefix = "");
   virtual ~Interface() {}
 
+  // output writes bytes to the serial line
   virtual void output(const std::string &) = 0;
 
-  // having pure pointers would improve performance here
-  // but it would be against the religion of so many
+  // register_input_cb is used to set the callback function which
+  // is called every time data is received from the serial line
   virtual void register_input_cb(void (*)(const std::string &msg,
                                           void *user_data),
                                  void *user_data) = 0;
@@ -47,6 +48,6 @@ class Interface {
   rclcpp::Parameter interface_prefix_;
 };
 
-}  // namespace ros2_serial
+}  // namespace remote_serial
 
 #endif  // OPENVMP_SERIAL_INTERFACE_H
